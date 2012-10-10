@@ -1,0 +1,21 @@
+#!/usr/bin/env mkb
+# Builder mkb file for the java portion of the Fortumo extension on android
+platform JAVA
+
+files
+{
+    (source/android)
+    Fortumo.java
+
+    (source/android/com/fernsblossom)
+	PaymentStatusReceiver.java
+	ReceiveInfo.java
+	PayActivity.java
+
+}
+
+librarypath "$MARMALADE_ROOT/s3e/deploy/plugins/android/android.jar"
+librarypath "$MARMALADE_ROOT/s3e/loader/android/s3e_release.jar"
+librarypath "FortumoPayAndroid-8.0.580.jar"
+
+option output-name=lib/android/Fortumo.jar
