@@ -2,12 +2,6 @@
 #
 # Include this subproject in your App to enable access to the Fortumo API
 #
-# NOTE: This file was originally written by the extension builder, but will not
-# be overwritten (unless --force is specified) and is intended to be modified.
-
-#
-# Running the extension builder with --platform can cause additions to this file
-# even after modification, to support additional platforms
 
 display_name "Extensions/Fortumo"
 
@@ -37,6 +31,8 @@ if {{ not defined IW_MKF_IWCRT}}
 #Include the extension's jar file during deployment
 deployments
 {
-    android-external-jars="lib/android/Fortumo.jar"
-    android-so="lib/android/libFortumo.so"
+	android-extra-manifest=extras.manifest.txt
+	android-extra-application-manifest=extras.application.txt
+    android-external-jars="Fortumo.jar"
+    android-so="libFortumo.so"
 }

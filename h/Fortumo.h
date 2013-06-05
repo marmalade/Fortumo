@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001-2012 Ideaworks3D Ltd.
- * All Rights Reserved.
+ * (C) 2001-2012 Marmalade. All Rights Reserved.
  *
  * This document is protected by copyright, and contains information
- * proprietary to Ideaworks Labs.
- * This file consists of source code released by Ideaworks Labs under
+ * proprietary to Marmalade.
+ *
+ * This file consists of source code released by Marmalade under
  * the terms of the accompanying End User License Agreement (EULA).
  * Please do not use this program/source code before you have read the
  * EULA and have agreed to be bound by its terms.
@@ -17,42 +17,29 @@
 #define S3E_EXT_FORTUMO_H
 
 #include <s3eTypes.h>
-#include <vector>
-#include <string>
 
-/**
- * Defines message status. Check Fortumo Java documentation for full explanation.
-*/
-typedef enum FortumoMessageStatus {
-	FORTUMO_MESSAGE_STATUS_BILLED=0,
-	FORTUMO_MESSAGE_STATUS_FAILED=1,
-	FORTUMO_MESSAGE_STATUS_NOT_SENT=2,
-	FORTUMO_MESSAGE_STATUS_PENDING=3
-} FortumoMessageStatus ;
+struct Fortumo_PaymentRequest;
+struct Fortumo_PaymentResponse;
 
-/**
- * Defines Fortumo response for payment attempt.
-*/
-struct ReceiveInfo {
-	FortumoMessageStatus billingStatus;
-	char creditAmount[256];
-	char creditName[256];
-	long messageId;
-	char paymentCode[256];
-	char priceAmount[256];
-	char priceCurrency[256];
-	char productName[256];
-	char serviceId[256];
-	char SKU[256];
-	char userId[256];
+struct Fortumo_ServiceRequest;
+struct Fortumo_ServiceResponse;
+
+enum Fortumo_BillingStatus {
+   Fortumo_BillingStatus_NotSent              = 0,
+   Fortumo_BillingStatus_Pending              = 1,
+   Fortumo_BillingStatus_Billed               = 2,
+   Fortumo_BillingStatus_Failed               = 3,
+   Fortumo_BillingStatus_UseAlternativeMethod = 4
 };
-/**
- * Defines callbacks.
-*/
-typedef enum FortumoCallback {
-	FORTUMO_RECEIVE_CALLBACK,
-	FORTUMO_CALLBACK_MAX,
-} FortumoCallback;
+
+enum Fortumo_ServiceStatus {
+	Fortumo_ServiceStatus_Unknown     = 0,
+	Fortumo_ServiceStatus_Available   = 1,
+	Fortumo_ServiceStatus_Unavailable = 2
+};
+
+typedef void (*Fortumo_Payment_Callback)(Fortumo_PaymentResponse* response, void* userData);
+typedef void (*Fortumo_Service_Callback)(Fortumo_ServiceResponse* response, void* userData);
 // \cond HIDDEN_DEFINES
 S3E_BEGIN_C_DECL
 // \endcond
@@ -62,64 +49,73 @@ S3E_BEGIN_C_DECL
  */
 s3eBool FortumoAvailable();
 
-/**
- * Registers a callback to be called for an operating system event.
- *
- * The available callback types are listed in @ref FortumoCallback.
- * @param cbid ID of the event for which to register.
- * @param fn callback function.
- * @param userdata Value to pass to the @e userdata parameter of @e NotifyFunc.
- * @return
- *  - @ref S3E_RESULT_SUCCESS if no error occurred.
- *  - @ref S3E_RESULT_ERROR if the operation failed.\n
- *
- * @see FortumoUnRegister
- * @note For more information on the system data passed as a parameter to the callback
- * registered using this function, see the @ref FortumoCallback enum.
- */
-s3eResult FortumoRegister(FortumoCallback cbid, s3eCallback fn, void* userData);
+void Fortumo_SetLoggingEnabled(s3eBool loggingEnabled);
 
-/**
- * Unregister a callback for a given event.
- * @param cbid ID of the callback for which to register.
- * @param fn Callback Function.
- * @return
- * - @ref S3E_RESULT_SUCCESS if no error occurred.
- * - @ref S3E_RESULT_ERROR if the operation failed.\n
- * @note For more information on the systemData passed as a parameter to the callback
- * registered using this function, see the FortumoCallback enum.
- * @note It is not necessary to define a return value for any registered callback.
- * @see FortumoRegister
- */
-s3eResult FortumoUnRegister(FortumoCallback cbid, s3eCallback fn);
+void Fortumo_SetStateChangeListener(Fortumo_Payment_Callback callback, void* userData);
 
-/**
- * Running this function starts SMS payment. It opens Fortumo's dialog box and starts Fortumo's Activity.
- *
- * To receive info about payment register FORTUMO_RECEIVE_CALLBACK. systemData passed to callback is ReceiveInfo structure.
- *
- * @param isConsumable true if service is consumable good
- * @param creditsMultiplier multiplier in percent. Should be set for 100 if you want to give normal amount of credits.
- * @param displayString String displayed as pop-up title.
- * @param productName Product name - as specified in Fortumo portal.
- * @param serviceId Service Id - shown at Fortumo portal.
- * @param serviceSecret Service secret - shown at Fortumo portal.
- * @param SKU SKU used by service user.
-*/
-s3eResult FortumoRequestPayment(bool isConsumable,int creditsMultiplier,const char* displayString,const char* productName,const char* serviceId,const char* serviceSecret,const char* SKU);
+void Fortumo_FindPayment(Fortumo_PaymentRequest* request, Fortumo_Payment_Callback callback, void* userData);
 
-/**
- * Terminates Fortumo.
-*/
-void FortumoTerminate();
+void Fortumo_MakePayment(Fortumo_PaymentRequest* request, Fortumo_Payment_Callback callback, void* userData);
 
-/**
- * Initialises Fortumo.
-*/
-s3eResult FortumoInit();
+Fortumo_PaymentRequest* Fortumo_PaymentRequest_Create();
+
+void Fortumo_PaymentRequest_SetService(Fortumo_PaymentRequest* request, const char* serviceId, const char* appSecret);
+
+void Fortumo_PaymentRequest_SetConsumable(Fortumo_PaymentRequest* request, s3eBool consumable);
+
+void Fortumo_PaymentRequest_SetCreditsMultiplier(Fortumo_PaymentRequest* request, double value);
+
+void Fortumo_PaymentRequest_SetDisplayString(Fortumo_PaymentRequest* request, const char* value);
+
+void Fortumo_PaymentRequest_SetIcon(Fortumo_PaymentRequest* request, s3e_int32_t iconId);
+
+void Fortumo_PaymentRequest_SetPriceAmount(Fortumo_PaymentRequest* request, const char* value);
+
+void Fortumo_PaymentRequest_SetPriceCurrency(Fortumo_PaymentRequest* request, const char* value);
+
+void Fortumo_PaymentRequest_SetProductName(Fortumo_PaymentRequest* request, const char* value);
+
+void Fortumo_PaymentRequest_Delete(Fortumo_PaymentRequest* request);
+
+Fortumo_BillingStatus Fortumo_PaymentResponse_GetBillingStatus(Fortumo_PaymentResponse* response);
+
+const char* Fortumo_PaymentResponse_GetCreditAmount(Fortumo_PaymentResponse* response);
+
+const char* Fortumo_PaymentResponse_GetCreditName(Fortumo_PaymentResponse* response);
+
+const char* Fortumo_PaymentResponse_GetPaymentCode(Fortumo_PaymentResponse* response);
+
+const char* Fortumo_PaymentResponse_GetPriceAmount(Fortumo_PaymentResponse* response);
+
+const char* Fortumo_PaymentResponse_GetPriceCurrency(Fortumo_PaymentResponse* response);
+
+const char* Fortumo_PaymentResponse_GetProductName(Fortumo_PaymentResponse* response);
+
+const char* Fortumo_PaymentResponse_GetMessageId(Fortumo_PaymentResponse* response);
+
+const char* Fortumo_PaymentResponse_GetServiceId(Fortumo_PaymentResponse* response);
+
+const char* Fortumo_PaymentResponse_GetUserId(Fortumo_PaymentResponse* response);
+
+void Fortumo_PaymentResponse_Delete(Fortumo_PaymentResponse* response);
+
+Fortumo_ServiceRequest* Fortumo_ServiceRequest_Create();
+
+void Fortumo_ServiceRequest_SetService(Fortumo_ServiceRequest* request, const char* serviceId, const char* appSecret);
+
+void Fortumo_ServiceRequest_SetTimeout(Fortumo_ServiceRequest* request, s3e_int32_t timeout);
+
+void Fortumo_ServiceRequest_Delete(Fortumo_ServiceRequest* request);
+
+const char* Fortumo_ServiceResponse_GetServiceId(Fortumo_ServiceResponse* response);
+
+Fortumo_ServiceStatus Fortumo_ServiceResponse_GetServiceStatus(Fortumo_ServiceResponse* response);
+
+void Fortumo_ServiceResponse_Delete(Fortumo_ServiceResponse* response);
+
+void Fortumo_FindService(Fortumo_ServiceRequest* request, Fortumo_Service_Callback callback, void* userData);
 
 S3E_END_C_DECL
-
 
 
 #endif /* !S3E_EXT_FORTUMO_H */
