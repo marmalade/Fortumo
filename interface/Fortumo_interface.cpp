@@ -44,8 +44,11 @@ typedef       void(*Fortumo_ServiceRequest_SetTimeout_t)(Fortumo_ServiceRequest*
 typedef       void(*Fortumo_ServiceRequest_Delete_t)(Fortumo_ServiceRequest* request);
 typedef const char*(*Fortumo_ServiceResponse_GetServiceId_t)(Fortumo_ServiceResponse* response);
 typedef Fortumo_ServiceStatus(*Fortumo_ServiceResponse_GetServiceStatus_t)(Fortumo_ServiceResponse* response);
+typedef s3e_int32_t(*Fortumo_ServiceResponse_GetPaymentCount_t)(Fortumo_ServiceResponse* response);
+typedef Fortumo_PaymentResponse*(*Fortumo_ServiceResponse_GetPaymentAtIndex_t)(Fortumo_ServiceResponse* response, s3e_int32_t index);
 typedef       void(*Fortumo_ServiceResponse_Delete_t)(Fortumo_ServiceResponse* response);
 typedef       void(*Fortumo_FindService_t)(Fortumo_ServiceRequest* request, Fortumo_Service_Callback callback, void* userData);
+typedef       void(*Fortumo_FindPaymentHistory_t)(Fortumo_ServiceRequest* request, Fortumo_Service_Callback callback, void* userData);
 
 /**
  * struct that gets filled in by FortumoRegister
@@ -83,8 +86,11 @@ typedef struct FortumoFuncs
     Fortumo_ServiceRequest_Delete_t m_Fortumo_ServiceRequest_Delete;
     Fortumo_ServiceResponse_GetServiceId_t m_Fortumo_ServiceResponse_GetServiceId;
     Fortumo_ServiceResponse_GetServiceStatus_t m_Fortumo_ServiceResponse_GetServiceStatus;
+    Fortumo_ServiceResponse_GetPaymentCount_t m_Fortumo_ServiceResponse_GetPaymentCount;
+    Fortumo_ServiceResponse_GetPaymentAtIndex_t m_Fortumo_ServiceResponse_GetPaymentAtIndex;
     Fortumo_ServiceResponse_Delete_t m_Fortumo_ServiceResponse_Delete;
     Fortumo_FindService_t m_Fortumo_FindService;
+    Fortumo_FindPaymentHistory_t m_Fortumo_FindPaymentHistory;
 } FortumoFuncs;
 
 static FortumoFuncs g_Ext;
@@ -812,9 +818,53 @@ Fortumo_ServiceStatus Fortumo_ServiceResponse_GetServiceStatus(Fortumo_ServiceRe
     return ret;
 }
 
+s3e_int32_t Fortumo_ServiceResponse_GetPaymentCount(Fortumo_ServiceResponse* response)
+{
+    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[31] func: Fortumo_ServiceResponse_GetPaymentCount"));
+
+    if (!_extLoad())
+        return 0;
+
+#ifdef __mips
+    // For MIPs platform we do not have asm code for stack switching 
+    // implemented. So we make LoaderCallStart call manually to set GlobalLock
+    s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
+#endif
+
+    s3e_int32_t ret = g_Ext.m_Fortumo_ServiceResponse_GetPaymentCount(response);
+
+#ifdef __mips
+    s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
+#endif
+
+    return ret;
+}
+
+Fortumo_PaymentResponse* Fortumo_ServiceResponse_GetPaymentAtIndex(Fortumo_ServiceResponse* response, s3e_int32_t index)
+{
+    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[32] func: Fortumo_ServiceResponse_GetPaymentAtIndex"));
+
+    if (!_extLoad())
+        return NULL;
+
+#ifdef __mips
+    // For MIPs platform we do not have asm code for stack switching 
+    // implemented. So we make LoaderCallStart call manually to set GlobalLock
+    s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
+#endif
+
+    Fortumo_PaymentResponse* ret = g_Ext.m_Fortumo_ServiceResponse_GetPaymentAtIndex(response, index);
+
+#ifdef __mips
+    s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
+#endif
+
+    return ret;
+}
+
 void Fortumo_ServiceResponse_Delete(Fortumo_ServiceResponse* response)
 {
-    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[31] func: Fortumo_ServiceResponse_Delete"));
+    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[33] func: Fortumo_ServiceResponse_Delete"));
 
     if (!_extLoad())
         return;
@@ -836,7 +886,7 @@ void Fortumo_ServiceResponse_Delete(Fortumo_ServiceResponse* response)
 
 void Fortumo_FindService(Fortumo_ServiceRequest* request, Fortumo_Service_Callback callback, void* userData)
 {
-    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[32] func: Fortumo_FindService"));
+    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[34] func: Fortumo_FindService"));
 
     if (!_extLoad())
         return;
@@ -848,6 +898,28 @@ void Fortumo_FindService(Fortumo_ServiceRequest* request, Fortumo_Service_Callba
 #endif
 
     g_Ext.m_Fortumo_FindService(request, callback, userData);
+
+#ifdef __mips
+    s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
+#endif
+
+    return;
+}
+
+void Fortumo_FindPaymentHistory(Fortumo_ServiceRequest* request, Fortumo_Service_Callback callback, void* userData)
+{
+    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[35] func: Fortumo_FindPaymentHistory"));
+
+    if (!_extLoad())
+        return;
+
+#ifdef __mips
+    // For MIPs platform we do not have asm code for stack switching 
+    // implemented. So we make LoaderCallStart call manually to set GlobalLock
+    s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
+#endif
+
+    g_Ext.m_Fortumo_FindPaymentHistory(request, callback, userData);
 
 #ifdef __mips
     s3eDeviceLoaderCallDone(S3E_TRUE, NULL);

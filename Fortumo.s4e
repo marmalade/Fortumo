@@ -63,8 +63,11 @@ void Fortumo_ServiceRequest_Delete(Fortumo_ServiceRequest* request) run_on_os_th
 
 const char* Fortumo_ServiceResponse_GetServiceId(Fortumo_ServiceResponse* response) NULL run_on_os_thread
 Fortumo_ServiceStatus Fortumo_ServiceResponse_GetServiceStatus(Fortumo_ServiceResponse* response) Fortumo_ServiceStatus_Unknown run_on_os_thread
+s3e_int32_t Fortumo_ServiceResponse_GetPaymentCount(Fortumo_ServiceResponse* response) 0 run_on_os_thread
+Fortumo_PaymentResponse* Fortumo_ServiceResponse_GetPaymentAtIndex(Fortumo_ServiceResponse* response, s3e_int32_t index) NULL run_on_os_thread
 void Fortumo_ServiceResponse_Delete(Fortumo_ServiceResponse* response) run_on_os_thread
 
 void Fortumo_FindService(Fortumo_ServiceRequest* request, Fortumo_Service_Callback callback, void* userData) run_on_os_thread
+void Fortumo_FindPaymentHistory(Fortumo_ServiceRequest* request, Fortumo_Service_Callback callback, void* userData) run_on_os_thread
 
 append:

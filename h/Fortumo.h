@@ -111,9 +111,15 @@ const char* Fortumo_ServiceResponse_GetServiceId(Fortumo_ServiceResponse* respon
 
 Fortumo_ServiceStatus Fortumo_ServiceResponse_GetServiceStatus(Fortumo_ServiceResponse* response);
 
+s3e_int32_t Fortumo_ServiceResponse_GetPaymentCount(Fortumo_ServiceResponse* response);
+
+Fortumo_PaymentResponse* Fortumo_ServiceResponse_GetPaymentAtIndex(Fortumo_ServiceResponse* response, s3e_int32_t index);
+
 void Fortumo_ServiceResponse_Delete(Fortumo_ServiceResponse* response);
 
 void Fortumo_FindService(Fortumo_ServiceRequest* request, Fortumo_Service_Callback callback, void* userData);
+
+void Fortumo_FindPaymentHistory(Fortumo_ServiceRequest* request, Fortumo_Service_Callback callback, void* userData);
 
 S3E_END_C_DECL
 
