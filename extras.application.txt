@@ -1,8 +1,8 @@
-<receiver android:name="com.fortumo.android.BillingSMSReceiver">
+<receiver android:name="mp.BillingSMSReceiver">
 	<intent-filter>
 		<action android:name="android.provider.Telephony.SMS_RECEIVED"></action>
 	</intent-filter>
 </receiver>
-<service android:name="com.fortumo.android.FortumoService" />
-<service android:name="com.fortumo.android.StatusUpdateService" />
-<activity android:name="com.fortumo.android.FortumoActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+<service android:name="mp.MpService" />
+<service android:name="mp.StatusUpdateService" />
+<activity android:name="mp.MpActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar" />
