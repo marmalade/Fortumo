@@ -23,6 +23,12 @@ enum Fortumo_ServiceStatus {
 	Fortumo_ServiceStatus_Unavailable = 2
 };
 
+enum Fortumo_ServiceType {
+	Fortumo_ServiceType_Consumable = 0,
+	Fortumo_ServiceType_NonConsumable = 1,
+	Fortumo_ServiceType_Subscription = 2
+};
+
 typedef void (*Fortumo_Payment_Callback)(Fortumo_PaymentResponse* response, void* userData);
 typedef void (*Fortumo_Service_Callback)(Fortumo_ServiceResponse* response, void* userData);
 
@@ -42,6 +48,7 @@ void Fortumo_PaymentRequest_SetIcon(Fortumo_PaymentRequest* request, s3e_int32_t
 void Fortumo_PaymentRequest_SetPriceAmount(Fortumo_PaymentRequest* request, const char* value) run_on_os_thread
 void Fortumo_PaymentRequest_SetPriceCurrency(Fortumo_PaymentRequest* request, const char* value) run_on_os_thread
 void Fortumo_PaymentRequest_SetProductName(Fortumo_PaymentRequest* request, const char* value) run_on_os_thread
+void Fortumo_PaymentRequest_SetType(Fortumo_PaymentRequest* request, Fortumo_ServiceType type) run_on_os_thread
 void Fortumo_PaymentRequest_Delete(Fortumo_PaymentRequest* request) run_on_os_thread
 
 Fortumo_BillingStatus Fortumo_PaymentResponse_GetBillingStatus(Fortumo_PaymentResponse* response) Fortumo_BillingStatus_NotSent run_on_os_thread

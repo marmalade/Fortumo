@@ -10,6 +10,15 @@
 
 #include "Fortumo.h"
 
+
+#ifndef S3E_EXT_SKIP_LOADER_CALL_LOCK
+// For MIPs (and WP8) platform we do not have asm code for stack switching
+// implemented. So we make LoaderCallStart call manually to set GlobalLock
+#if defined __mips || defined S3E_ANDROID_X86 || (defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP))
+#define LOADER_CALL_LOCK
+#endif
+#endif
+
 /**
  * Definitions for functions types passed to/from s3eExt interface
  */
@@ -26,6 +35,7 @@ typedef       void(*Fortumo_PaymentRequest_SetIcon_t)(Fortumo_PaymentRequest* re
 typedef       void(*Fortumo_PaymentRequest_SetPriceAmount_t)(Fortumo_PaymentRequest* request, const char* value);
 typedef       void(*Fortumo_PaymentRequest_SetPriceCurrency_t)(Fortumo_PaymentRequest* request, const char* value);
 typedef       void(*Fortumo_PaymentRequest_SetProductName_t)(Fortumo_PaymentRequest* request, const char* value);
+typedef       void(*Fortumo_PaymentRequest_SetType_t)(Fortumo_PaymentRequest* request, Fortumo_ServiceType type);
 typedef       void(*Fortumo_PaymentRequest_Delete_t)(Fortumo_PaymentRequest* request);
 typedef Fortumo_BillingStatus(*Fortumo_PaymentResponse_GetBillingStatus_t)(Fortumo_PaymentResponse* response);
 typedef const char*(*Fortumo_PaymentResponse_GetCreditAmount_t)(Fortumo_PaymentResponse* response);
@@ -68,6 +78,7 @@ typedef struct FortumoFuncs
     Fortumo_PaymentRequest_SetPriceAmount_t m_Fortumo_PaymentRequest_SetPriceAmount;
     Fortumo_PaymentRequest_SetPriceCurrency_t m_Fortumo_PaymentRequest_SetPriceCurrency;
     Fortumo_PaymentRequest_SetProductName_t m_Fortumo_PaymentRequest_SetProductName;
+    Fortumo_PaymentRequest_SetType_t m_Fortumo_PaymentRequest_SetType;
     Fortumo_PaymentRequest_Delete_t m_Fortumo_PaymentRequest_Delete;
     Fortumo_PaymentResponse_GetBillingStatus_t m_Fortumo_PaymentResponse_GetBillingStatus;
     Fortumo_PaymentResponse_GetCreditAmount_t m_Fortumo_PaymentResponse_GetCreditAmount;
@@ -107,7 +118,7 @@ static bool _extLoad()
             g_GotExt = true;
         else
             s3eDebugAssertShow(S3E_MESSAGE_CONTINUE_STOP_IGNORE,                 "error loading extension: Fortumo");
-            
+
         g_TriedExt = true;
         g_TriedNoMsgExt = true;
     }
@@ -143,15 +154,13 @@ void Fortumo_SetLoggingEnabled(s3eBool loggingEnabled)
     if (!_extLoad())
         return;
 
-#ifdef __mips
-    // For MIPs platform we do not have asm code for stack switching 
-    // implemented. So we make LoaderCallStart call manually to set GlobalLock
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
 #endif
 
     g_Ext.m_Fortumo_SetLoggingEnabled(loggingEnabled);
 
-#ifdef __mips
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
 #endif
 
@@ -165,15 +174,13 @@ void Fortumo_SetStateChangeListener(Fortumo_Payment_Callback callback, void* use
     if (!_extLoad())
         return;
 
-#ifdef __mips
-    // For MIPs platform we do not have asm code for stack switching 
-    // implemented. So we make LoaderCallStart call manually to set GlobalLock
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
 #endif
 
     g_Ext.m_Fortumo_SetStateChangeListener(callback, userData);
 
-#ifdef __mips
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
 #endif
 
@@ -187,15 +194,13 @@ void Fortumo_FindPayment(Fortumo_PaymentRequest* request, Fortumo_Payment_Callba
     if (!_extLoad())
         return;
 
-#ifdef __mips
-    // For MIPs platform we do not have asm code for stack switching 
-    // implemented. So we make LoaderCallStart call manually to set GlobalLock
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
 #endif
 
     g_Ext.m_Fortumo_FindPayment(request, callback, userData);
 
-#ifdef __mips
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
 #endif
 
@@ -209,15 +214,13 @@ void Fortumo_MakePayment(Fortumo_PaymentRequest* request, Fortumo_Payment_Callba
     if (!_extLoad())
         return;
 
-#ifdef __mips
-    // For MIPs platform we do not have asm code for stack switching 
-    // implemented. So we make LoaderCallStart call manually to set GlobalLock
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
 #endif
 
     g_Ext.m_Fortumo_MakePayment(request, callback, userData);
 
-#ifdef __mips
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
 #endif
 
@@ -231,15 +234,13 @@ Fortumo_PaymentRequest* Fortumo_PaymentRequest_Create()
     if (!_extLoad())
         return NULL;
 
-#ifdef __mips
-    // For MIPs platform we do not have asm code for stack switching 
-    // implemented. So we make LoaderCallStart call manually to set GlobalLock
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
 #endif
 
     Fortumo_PaymentRequest* ret = g_Ext.m_Fortumo_PaymentRequest_Create();
 
-#ifdef __mips
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
 #endif
 
@@ -253,15 +254,13 @@ void Fortumo_PaymentRequest_SetService(Fortumo_PaymentRequest* request, const ch
     if (!_extLoad())
         return;
 
-#ifdef __mips
-    // For MIPs platform we do not have asm code for stack switching 
-    // implemented. So we make LoaderCallStart call manually to set GlobalLock
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
 #endif
 
     g_Ext.m_Fortumo_PaymentRequest_SetService(request, serviceId, appSecret);
 
-#ifdef __mips
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
 #endif
 
@@ -275,15 +274,13 @@ void Fortumo_PaymentRequest_SetConsumable(Fortumo_PaymentRequest* request, s3eBo
     if (!_extLoad())
         return;
 
-#ifdef __mips
-    // For MIPs platform we do not have asm code for stack switching 
-    // implemented. So we make LoaderCallStart call manually to set GlobalLock
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
 #endif
 
     g_Ext.m_Fortumo_PaymentRequest_SetConsumable(request, consumable);
 
-#ifdef __mips
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
 #endif
 
@@ -297,15 +294,13 @@ void Fortumo_PaymentRequest_SetCreditsMultiplier(Fortumo_PaymentRequest* request
     if (!_extLoad())
         return;
 
-#ifdef __mips
-    // For MIPs platform we do not have asm code for stack switching 
-    // implemented. So we make LoaderCallStart call manually to set GlobalLock
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
 #endif
 
     g_Ext.m_Fortumo_PaymentRequest_SetCreditsMultiplier(request, value);
 
-#ifdef __mips
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
 #endif
 
@@ -319,15 +314,13 @@ void Fortumo_PaymentRequest_SetDisplayString(Fortumo_PaymentRequest* request, co
     if (!_extLoad())
         return;
 
-#ifdef __mips
-    // For MIPs platform we do not have asm code for stack switching 
-    // implemented. So we make LoaderCallStart call manually to set GlobalLock
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
 #endif
 
     g_Ext.m_Fortumo_PaymentRequest_SetDisplayString(request, value);
 
-#ifdef __mips
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
 #endif
 
@@ -341,15 +334,13 @@ void Fortumo_PaymentRequest_SetIcon(Fortumo_PaymentRequest* request, s3e_int32_t
     if (!_extLoad())
         return;
 
-#ifdef __mips
-    // For MIPs platform we do not have asm code for stack switching 
-    // implemented. So we make LoaderCallStart call manually to set GlobalLock
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
 #endif
 
     g_Ext.m_Fortumo_PaymentRequest_SetIcon(request, iconId);
 
-#ifdef __mips
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
 #endif
 
@@ -363,15 +354,13 @@ void Fortumo_PaymentRequest_SetPriceAmount(Fortumo_PaymentRequest* request, cons
     if (!_extLoad())
         return;
 
-#ifdef __mips
-    // For MIPs platform we do not have asm code for stack switching 
-    // implemented. So we make LoaderCallStart call manually to set GlobalLock
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
 #endif
 
     g_Ext.m_Fortumo_PaymentRequest_SetPriceAmount(request, value);
 
-#ifdef __mips
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
 #endif
 
@@ -385,15 +374,13 @@ void Fortumo_PaymentRequest_SetPriceCurrency(Fortumo_PaymentRequest* request, co
     if (!_extLoad())
         return;
 
-#ifdef __mips
-    // For MIPs platform we do not have asm code for stack switching 
-    // implemented. So we make LoaderCallStart call manually to set GlobalLock
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
 #endif
 
     g_Ext.m_Fortumo_PaymentRequest_SetPriceCurrency(request, value);
 
-#ifdef __mips
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
 #endif
 
@@ -407,15 +394,33 @@ void Fortumo_PaymentRequest_SetProductName(Fortumo_PaymentRequest* request, cons
     if (!_extLoad())
         return;
 
-#ifdef __mips
-    // For MIPs platform we do not have asm code for stack switching 
-    // implemented. So we make LoaderCallStart call manually to set GlobalLock
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
 #endif
 
     g_Ext.m_Fortumo_PaymentRequest_SetProductName(request, value);
 
-#ifdef __mips
+#ifdef LOADER_CALL_LOCK
+    s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
+#endif
+
+    return;
+}
+
+void Fortumo_PaymentRequest_SetType(Fortumo_PaymentRequest* request, Fortumo_ServiceType type)
+{
+    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[13] func: Fortumo_PaymentRequest_SetType"));
+
+    if (!_extLoad())
+        return;
+
+#ifdef LOADER_CALL_LOCK
+    s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
+#endif
+
+    g_Ext.m_Fortumo_PaymentRequest_SetType(request, type);
+
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
 #endif
 
@@ -424,20 +429,18 @@ void Fortumo_PaymentRequest_SetProductName(Fortumo_PaymentRequest* request, cons
 
 void Fortumo_PaymentRequest_Delete(Fortumo_PaymentRequest* request)
 {
-    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[13] func: Fortumo_PaymentRequest_Delete"));
+    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[14] func: Fortumo_PaymentRequest_Delete"));
 
     if (!_extLoad())
         return;
 
-#ifdef __mips
-    // For MIPs platform we do not have asm code for stack switching 
-    // implemented. So we make LoaderCallStart call manually to set GlobalLock
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
 #endif
 
     g_Ext.m_Fortumo_PaymentRequest_Delete(request);
 
-#ifdef __mips
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
 #endif
 
@@ -446,20 +449,18 @@ void Fortumo_PaymentRequest_Delete(Fortumo_PaymentRequest* request)
 
 Fortumo_BillingStatus Fortumo_PaymentResponse_GetBillingStatus(Fortumo_PaymentResponse* response)
 {
-    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[14] func: Fortumo_PaymentResponse_GetBillingStatus"));
+    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[15] func: Fortumo_PaymentResponse_GetBillingStatus"));
 
     if (!_extLoad())
         return Fortumo_BillingStatus_NotSent;
 
-#ifdef __mips
-    // For MIPs platform we do not have asm code for stack switching 
-    // implemented. So we make LoaderCallStart call manually to set GlobalLock
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
 #endif
 
     Fortumo_BillingStatus ret = g_Ext.m_Fortumo_PaymentResponse_GetBillingStatus(response);
 
-#ifdef __mips
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
 #endif
 
@@ -468,20 +469,18 @@ Fortumo_BillingStatus Fortumo_PaymentResponse_GetBillingStatus(Fortumo_PaymentRe
 
 const char* Fortumo_PaymentResponse_GetCreditAmount(Fortumo_PaymentResponse* response)
 {
-    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[15] func: Fortumo_PaymentResponse_GetCreditAmount"));
+    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[16] func: Fortumo_PaymentResponse_GetCreditAmount"));
 
     if (!_extLoad())
         return NULL;
 
-#ifdef __mips
-    // For MIPs platform we do not have asm code for stack switching 
-    // implemented. So we make LoaderCallStart call manually to set GlobalLock
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
 #endif
 
     const char* ret = g_Ext.m_Fortumo_PaymentResponse_GetCreditAmount(response);
 
-#ifdef __mips
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
 #endif
 
@@ -490,20 +489,18 @@ const char* Fortumo_PaymentResponse_GetCreditAmount(Fortumo_PaymentResponse* res
 
 const char* Fortumo_PaymentResponse_GetCreditName(Fortumo_PaymentResponse* response)
 {
-    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[16] func: Fortumo_PaymentResponse_GetCreditName"));
+    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[17] func: Fortumo_PaymentResponse_GetCreditName"));
 
     if (!_extLoad())
         return NULL;
 
-#ifdef __mips
-    // For MIPs platform we do not have asm code for stack switching 
-    // implemented. So we make LoaderCallStart call manually to set GlobalLock
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
 #endif
 
     const char* ret = g_Ext.m_Fortumo_PaymentResponse_GetCreditName(response);
 
-#ifdef __mips
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
 #endif
 
@@ -512,20 +509,18 @@ const char* Fortumo_PaymentResponse_GetCreditName(Fortumo_PaymentResponse* respo
 
 const char* Fortumo_PaymentResponse_GetPaymentCode(Fortumo_PaymentResponse* response)
 {
-    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[17] func: Fortumo_PaymentResponse_GetPaymentCode"));
+    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[18] func: Fortumo_PaymentResponse_GetPaymentCode"));
 
     if (!_extLoad())
         return NULL;
 
-#ifdef __mips
-    // For MIPs platform we do not have asm code for stack switching 
-    // implemented. So we make LoaderCallStart call manually to set GlobalLock
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
 #endif
 
     const char* ret = g_Ext.m_Fortumo_PaymentResponse_GetPaymentCode(response);
 
-#ifdef __mips
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
 #endif
 
@@ -534,20 +529,18 @@ const char* Fortumo_PaymentResponse_GetPaymentCode(Fortumo_PaymentResponse* resp
 
 const char* Fortumo_PaymentResponse_GetPriceAmount(Fortumo_PaymentResponse* response)
 {
-    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[18] func: Fortumo_PaymentResponse_GetPriceAmount"));
+    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[19] func: Fortumo_PaymentResponse_GetPriceAmount"));
 
     if (!_extLoad())
         return NULL;
 
-#ifdef __mips
-    // For MIPs platform we do not have asm code for stack switching 
-    // implemented. So we make LoaderCallStart call manually to set GlobalLock
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
 #endif
 
     const char* ret = g_Ext.m_Fortumo_PaymentResponse_GetPriceAmount(response);
 
-#ifdef __mips
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
 #endif
 
@@ -556,20 +549,18 @@ const char* Fortumo_PaymentResponse_GetPriceAmount(Fortumo_PaymentResponse* resp
 
 const char* Fortumo_PaymentResponse_GetPriceCurrency(Fortumo_PaymentResponse* response)
 {
-    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[19] func: Fortumo_PaymentResponse_GetPriceCurrency"));
+    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[20] func: Fortumo_PaymentResponse_GetPriceCurrency"));
 
     if (!_extLoad())
         return NULL;
 
-#ifdef __mips
-    // For MIPs platform we do not have asm code for stack switching 
-    // implemented. So we make LoaderCallStart call manually to set GlobalLock
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
 #endif
 
     const char* ret = g_Ext.m_Fortumo_PaymentResponse_GetPriceCurrency(response);
 
-#ifdef __mips
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
 #endif
 
@@ -578,20 +569,18 @@ const char* Fortumo_PaymentResponse_GetPriceCurrency(Fortumo_PaymentResponse* re
 
 const char* Fortumo_PaymentResponse_GetProductName(Fortumo_PaymentResponse* response)
 {
-    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[20] func: Fortumo_PaymentResponse_GetProductName"));
+    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[21] func: Fortumo_PaymentResponse_GetProductName"));
 
     if (!_extLoad())
         return NULL;
 
-#ifdef __mips
-    // For MIPs platform we do not have asm code for stack switching 
-    // implemented. So we make LoaderCallStart call manually to set GlobalLock
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
 #endif
 
     const char* ret = g_Ext.m_Fortumo_PaymentResponse_GetProductName(response);
 
-#ifdef __mips
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
 #endif
 
@@ -600,20 +589,18 @@ const char* Fortumo_PaymentResponse_GetProductName(Fortumo_PaymentResponse* resp
 
 const char* Fortumo_PaymentResponse_GetMessageId(Fortumo_PaymentResponse* response)
 {
-    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[21] func: Fortumo_PaymentResponse_GetMessageId"));
+    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[22] func: Fortumo_PaymentResponse_GetMessageId"));
 
     if (!_extLoad())
         return NULL;
 
-#ifdef __mips
-    // For MIPs platform we do not have asm code for stack switching 
-    // implemented. So we make LoaderCallStart call manually to set GlobalLock
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
 #endif
 
     const char* ret = g_Ext.m_Fortumo_PaymentResponse_GetMessageId(response);
 
-#ifdef __mips
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
 #endif
 
@@ -622,20 +609,18 @@ const char* Fortumo_PaymentResponse_GetMessageId(Fortumo_PaymentResponse* respon
 
 const char* Fortumo_PaymentResponse_GetServiceId(Fortumo_PaymentResponse* response)
 {
-    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[22] func: Fortumo_PaymentResponse_GetServiceId"));
+    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[23] func: Fortumo_PaymentResponse_GetServiceId"));
 
     if (!_extLoad())
         return NULL;
 
-#ifdef __mips
-    // For MIPs platform we do not have asm code for stack switching 
-    // implemented. So we make LoaderCallStart call manually to set GlobalLock
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
 #endif
 
     const char* ret = g_Ext.m_Fortumo_PaymentResponse_GetServiceId(response);
 
-#ifdef __mips
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
 #endif
 
@@ -644,20 +629,18 @@ const char* Fortumo_PaymentResponse_GetServiceId(Fortumo_PaymentResponse* respon
 
 const char* Fortumo_PaymentResponse_GetUserId(Fortumo_PaymentResponse* response)
 {
-    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[23] func: Fortumo_PaymentResponse_GetUserId"));
+    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[24] func: Fortumo_PaymentResponse_GetUserId"));
 
     if (!_extLoad())
         return NULL;
 
-#ifdef __mips
-    // For MIPs platform we do not have asm code for stack switching 
-    // implemented. So we make LoaderCallStart call manually to set GlobalLock
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
 #endif
 
     const char* ret = g_Ext.m_Fortumo_PaymentResponse_GetUserId(response);
 
-#ifdef __mips
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
 #endif
 
@@ -666,20 +649,18 @@ const char* Fortumo_PaymentResponse_GetUserId(Fortumo_PaymentResponse* response)
 
 void Fortumo_PaymentResponse_Delete(Fortumo_PaymentResponse* response)
 {
-    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[24] func: Fortumo_PaymentResponse_Delete"));
+    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[25] func: Fortumo_PaymentResponse_Delete"));
 
     if (!_extLoad())
         return;
 
-#ifdef __mips
-    // For MIPs platform we do not have asm code for stack switching 
-    // implemented. So we make LoaderCallStart call manually to set GlobalLock
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
 #endif
 
     g_Ext.m_Fortumo_PaymentResponse_Delete(response);
 
-#ifdef __mips
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
 #endif
 
@@ -688,20 +669,18 @@ void Fortumo_PaymentResponse_Delete(Fortumo_PaymentResponse* response)
 
 Fortumo_ServiceRequest* Fortumo_ServiceRequest_Create()
 {
-    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[25] func: Fortumo_ServiceRequest_Create"));
+    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[26] func: Fortumo_ServiceRequest_Create"));
 
     if (!_extLoad())
         return NULL;
 
-#ifdef __mips
-    // For MIPs platform we do not have asm code for stack switching 
-    // implemented. So we make LoaderCallStart call manually to set GlobalLock
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
 #endif
 
     Fortumo_ServiceRequest* ret = g_Ext.m_Fortumo_ServiceRequest_Create();
 
-#ifdef __mips
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
 #endif
 
@@ -710,20 +689,18 @@ Fortumo_ServiceRequest* Fortumo_ServiceRequest_Create()
 
 void Fortumo_ServiceRequest_SetService(Fortumo_ServiceRequest* request, const char* serviceId, const char* appSecret)
 {
-    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[26] func: Fortumo_ServiceRequest_SetService"));
+    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[27] func: Fortumo_ServiceRequest_SetService"));
 
     if (!_extLoad())
         return;
 
-#ifdef __mips
-    // For MIPs platform we do not have asm code for stack switching 
-    // implemented. So we make LoaderCallStart call manually to set GlobalLock
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
 #endif
 
     g_Ext.m_Fortumo_ServiceRequest_SetService(request, serviceId, appSecret);
 
-#ifdef __mips
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
 #endif
 
@@ -732,20 +709,18 @@ void Fortumo_ServiceRequest_SetService(Fortumo_ServiceRequest* request, const ch
 
 void Fortumo_ServiceRequest_SetTimeout(Fortumo_ServiceRequest* request, s3e_int32_t timeout)
 {
-    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[27] func: Fortumo_ServiceRequest_SetTimeout"));
+    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[28] func: Fortumo_ServiceRequest_SetTimeout"));
 
     if (!_extLoad())
         return;
 
-#ifdef __mips
-    // For MIPs platform we do not have asm code for stack switching 
-    // implemented. So we make LoaderCallStart call manually to set GlobalLock
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
 #endif
 
     g_Ext.m_Fortumo_ServiceRequest_SetTimeout(request, timeout);
 
-#ifdef __mips
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
 #endif
 
@@ -754,20 +729,18 @@ void Fortumo_ServiceRequest_SetTimeout(Fortumo_ServiceRequest* request, s3e_int3
 
 void Fortumo_ServiceRequest_Delete(Fortumo_ServiceRequest* request)
 {
-    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[28] func: Fortumo_ServiceRequest_Delete"));
+    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[29] func: Fortumo_ServiceRequest_Delete"));
 
     if (!_extLoad())
         return;
 
-#ifdef __mips
-    // For MIPs platform we do not have asm code for stack switching 
-    // implemented. So we make LoaderCallStart call manually to set GlobalLock
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
 #endif
 
     g_Ext.m_Fortumo_ServiceRequest_Delete(request);
 
-#ifdef __mips
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
 #endif
 
@@ -776,20 +749,18 @@ void Fortumo_ServiceRequest_Delete(Fortumo_ServiceRequest* request)
 
 const char* Fortumo_ServiceResponse_GetServiceId(Fortumo_ServiceResponse* response)
 {
-    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[29] func: Fortumo_ServiceResponse_GetServiceId"));
+    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[30] func: Fortumo_ServiceResponse_GetServiceId"));
 
     if (!_extLoad())
         return NULL;
 
-#ifdef __mips
-    // For MIPs platform we do not have asm code for stack switching 
-    // implemented. So we make LoaderCallStart call manually to set GlobalLock
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
 #endif
 
     const char* ret = g_Ext.m_Fortumo_ServiceResponse_GetServiceId(response);
 
-#ifdef __mips
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
 #endif
 
@@ -798,20 +769,18 @@ const char* Fortumo_ServiceResponse_GetServiceId(Fortumo_ServiceResponse* respon
 
 Fortumo_ServiceStatus Fortumo_ServiceResponse_GetServiceStatus(Fortumo_ServiceResponse* response)
 {
-    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[30] func: Fortumo_ServiceResponse_GetServiceStatus"));
+    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[31] func: Fortumo_ServiceResponse_GetServiceStatus"));
 
     if (!_extLoad())
         return Fortumo_ServiceStatus_Unknown;
 
-#ifdef __mips
-    // For MIPs platform we do not have asm code for stack switching 
-    // implemented. So we make LoaderCallStart call manually to set GlobalLock
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
 #endif
 
     Fortumo_ServiceStatus ret = g_Ext.m_Fortumo_ServiceResponse_GetServiceStatus(response);
 
-#ifdef __mips
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
 #endif
 
@@ -820,20 +789,18 @@ Fortumo_ServiceStatus Fortumo_ServiceResponse_GetServiceStatus(Fortumo_ServiceRe
 
 s3e_int32_t Fortumo_ServiceResponse_GetPaymentCount(Fortumo_ServiceResponse* response)
 {
-    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[31] func: Fortumo_ServiceResponse_GetPaymentCount"));
+    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[32] func: Fortumo_ServiceResponse_GetPaymentCount"));
 
     if (!_extLoad())
         return 0;
 
-#ifdef __mips
-    // For MIPs platform we do not have asm code for stack switching 
-    // implemented. So we make LoaderCallStart call manually to set GlobalLock
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
 #endif
 
     s3e_int32_t ret = g_Ext.m_Fortumo_ServiceResponse_GetPaymentCount(response);
 
-#ifdef __mips
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
 #endif
 
@@ -842,20 +809,18 @@ s3e_int32_t Fortumo_ServiceResponse_GetPaymentCount(Fortumo_ServiceResponse* res
 
 Fortumo_PaymentResponse* Fortumo_ServiceResponse_GetPaymentAtIndex(Fortumo_ServiceResponse* response, s3e_int32_t index)
 {
-    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[32] func: Fortumo_ServiceResponse_GetPaymentAtIndex"));
+    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[33] func: Fortumo_ServiceResponse_GetPaymentAtIndex"));
 
     if (!_extLoad())
         return NULL;
 
-#ifdef __mips
-    // For MIPs platform we do not have asm code for stack switching 
-    // implemented. So we make LoaderCallStart call manually to set GlobalLock
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
 #endif
 
     Fortumo_PaymentResponse* ret = g_Ext.m_Fortumo_ServiceResponse_GetPaymentAtIndex(response, index);
 
-#ifdef __mips
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
 #endif
 
@@ -864,20 +829,18 @@ Fortumo_PaymentResponse* Fortumo_ServiceResponse_GetPaymentAtIndex(Fortumo_Servi
 
 void Fortumo_ServiceResponse_Delete(Fortumo_ServiceResponse* response)
 {
-    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[33] func: Fortumo_ServiceResponse_Delete"));
+    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[34] func: Fortumo_ServiceResponse_Delete"));
 
     if (!_extLoad())
         return;
 
-#ifdef __mips
-    // For MIPs platform we do not have asm code for stack switching 
-    // implemented. So we make LoaderCallStart call manually to set GlobalLock
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
 #endif
 
     g_Ext.m_Fortumo_ServiceResponse_Delete(response);
 
-#ifdef __mips
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
 #endif
 
@@ -886,20 +849,18 @@ void Fortumo_ServiceResponse_Delete(Fortumo_ServiceResponse* response)
 
 void Fortumo_FindService(Fortumo_ServiceRequest* request, Fortumo_Service_Callback callback, void* userData)
 {
-    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[34] func: Fortumo_FindService"));
+    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[35] func: Fortumo_FindService"));
 
     if (!_extLoad())
         return;
 
-#ifdef __mips
-    // For MIPs platform we do not have asm code for stack switching 
-    // implemented. So we make LoaderCallStart call manually to set GlobalLock
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
 #endif
 
     g_Ext.m_Fortumo_FindService(request, callback, userData);
 
-#ifdef __mips
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
 #endif
 
@@ -908,20 +869,18 @@ void Fortumo_FindService(Fortumo_ServiceRequest* request, Fortumo_Service_Callba
 
 void Fortumo_FindPaymentHistory(Fortumo_ServiceRequest* request, Fortumo_Service_Callback callback, void* userData)
 {
-    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[35] func: Fortumo_FindPaymentHistory"));
+    IwTrace(FORTUMO_VERBOSE, ("calling Fortumo[36] func: Fortumo_FindPaymentHistory"));
 
     if (!_extLoad())
         return;
 
-#ifdef __mips
-    // For MIPs platform we do not have asm code for stack switching 
-    // implemented. So we make LoaderCallStart call manually to set GlobalLock
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
 #endif
 
     g_Ext.m_Fortumo_FindPaymentHistory(request, callback, userData);
 
-#ifdef __mips
+#ifdef LOADER_CALL_LOCK
     s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
 #endif
 

@@ -38,6 +38,12 @@ enum Fortumo_ServiceStatus {
 	Fortumo_ServiceStatus_Unavailable = 2
 };
 
+enum Fortumo_ServiceType {
+	Fortumo_ServiceType_Consumable = 0,
+	Fortumo_ServiceType_NonConsumable = 1,
+	Fortumo_ServiceType_Subscription = 2
+};
+
 typedef void (*Fortumo_Payment_Callback)(Fortumo_PaymentResponse* response, void* userData);
 typedef void (*Fortumo_Service_Callback)(Fortumo_ServiceResponse* response, void* userData);
 // \cond HIDDEN_DEFINES
@@ -74,6 +80,8 @@ void Fortumo_PaymentRequest_SetPriceAmount(Fortumo_PaymentRequest* request, cons
 void Fortumo_PaymentRequest_SetPriceCurrency(Fortumo_PaymentRequest* request, const char* value);
 
 void Fortumo_PaymentRequest_SetProductName(Fortumo_PaymentRequest* request, const char* value);
+
+void Fortumo_PaymentRequest_SetType(Fortumo_PaymentRequest* request, Fortumo_ServiceType type);
 
 void Fortumo_PaymentRequest_Delete(Fortumo_PaymentRequest* request);
 

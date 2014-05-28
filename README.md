@@ -14,7 +14,7 @@ on the device or on server-side so that users will keep access to the goods:
 	Fortumo_PaymentRequest_SetDisplayString(request, "display_string_here");
     Fortumo_PaymentRequest_SetService(request, "service_id_here", "app_secret_here");
 	Fortumo_PaymentRequest_SetProductName(request, "product_name_here");
-    Fortumo_PaymentRequest_SetConsumable(request, true);
+    Fortumo_PaymentRequest_SetType(request, Fortumo_ServiceType_Consumable);
     Fortumo_MakePayment(request, &Fortumo_OnPaymentComplete, NULL);
     Fortumo_PaymentRequest_Delete(request);
 
