@@ -6,3 +6,4 @@
 
 <permission android:protectionLevel="signature" android:name="plugin.fortumo.PAYMENT_BROADCAST_PERMISSION" />
 <uses-permission android:name="plugin.fortumo.PAYMENT_BROADCAST_PERMISSION" />
+<uses-feature android:name="android.hardware.telephony" android:required="false" />
